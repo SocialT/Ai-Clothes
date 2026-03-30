@@ -1,0 +1,9 @@
+venv/
+venv_mac/
+.git/
+.gitignore
+*.md
+node_modules/
+.env
+.env.local
+

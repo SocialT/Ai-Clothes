@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-py"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int          @id @default(autoincrement())
+  name         String
+  email        String       @unique
+  passwordHash String
+  createdAt    DateTime     @default(now())
+  garments     Garment[]
+  generations  Generation[]
+}
+
+model Garment {
+  id          Int          @id @default(autoincrement())
+  userId      Int
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  imageUrl    String
+  category    String?      // e.g., "shirt", "pants", "dress"
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  generations Generation[]
+}
+
+model Generation {
+  id            Int          @id @default(autoincrement())
+  userId        Int
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  garmentId     Int?
+  garment       Garment?     @relation(fields: [garmentId], references: [id], onDelete: SetNull)
+  originalImage String       // Original image URL
+  generatedImage String?     // Generated image URL
+  style         String?      // Style preference
+  ambiance      String?      // Ambiance preference
+  avatar        String?      // Avatar preference
+  prompt        String?      // Generated prompt
+  status        String       @default("pending") // pending, processing, completed, failed
+  errorMessage  String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model Style {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  prompt      String   // AI prompt for this style
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
+
+model Ambiance {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  prompt      String   // AI prompt for this ambiance
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
+
+model Avatar {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  prompt      String   // AI prompt for this avatar
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
